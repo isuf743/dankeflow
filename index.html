@@ -1223,40 +1223,57 @@
     }
   }
 
-  /* ---------- projektet: ngrihen ne 3D me scroll + anojne drejt kursorit ---------- */
-  .work-grid{ perspective:1400px; }
-  .work-grid .work-card,
-  .work-grid .work-card:hover{
-    --p:1; --rx:0deg; --ry:0deg; --lift:0px; --side:-1;
-    transform-origin:50% 100%;
-    transform:
-      translateY(calc((1 - var(--p)) * 130px + var(--lift)))
-      rotateX(calc((1 - var(--p)) * 34deg + var(--rx)))
-      rotateY(calc((1 - var(--p)) * var(--side) * 16deg + var(--ry)))
-      scale(calc(.88 + var(--p) * .12));
-    opacity:calc(.12 + var(--p) * .88);
-    transition: transform .55s var(--ease), box-shadow .5s var(--ease), background-size .55s var(--ease), background-position .55s var(--ease);
-    will-change:transform, opacity;
+  /* ---------- projektet: karusel 3D ---------- */
+  .work-grid.work-carousel{
+    display:block;
+    position:relative;
+    height:clamp(470px, 46vw, 640px);
+    margin-top:30px;
+    perspective:1700px;
+    touch-action:pan-y;
+    user-select:none;
+    -webkit-user-select:none;
+    cursor:grab;
   }
-  .work-grid .work-card:nth-child(even){ --side:1; }
-  .work-grid .work-card:hover{ --lift:-8px; }
-  .work-grid .work-card.is-tilt{
-    transition: transform .12s linear, box-shadow .4s var(--ease), background-size .12s linear, background-position .12s linear;
-    box-shadow:0 36px 70px rgba(0,0,0,.26);
-    background-size:110%;
-    background-position: var(--bgx,50%) var(--bgy,0%);
+  .work-grid.work-carousel.is-dragging{ cursor:grabbing; }
+  .work-ring{
+    position:absolute; inset:0;
+    transform-style:preserve-3d;
   }
-  .work-card__glare{
-    position:absolute; inset:0; z-index:1; pointer-events:none; opacity:0;
-    border-radius:inherit;
-    background:radial-gradient(circle at var(--gx,50%) var(--gy,50%), rgba(255,255,255,.34), rgba(255,255,255,0) 46%);
-    mix-blend-mode:soft-light;
-    transition:opacity .4s var(--ease);
+  .work-carousel .work-card{
+    position:absolute;
+    left:50%; top:50%;
+    width:clamp(230px, 25vw, 340px);
+    translate:-50% -50%;
+    transition: transform .85s var(--ease), opacity .85s var(--ease), filter .85s var(--ease), box-shadow .5s var(--ease);
+    box-shadow:0 30px 60px rgba(0,0,0,.22);
+    -webkit-user-drag:none;
   }
-  .work-card.is-tilt .work-card__glare{ opacity:1; }
-  .work-card--live > div, .work-card__link-icon{ z-index:2; }
-  @media (prefers-reduced-motion: reduce){
-    .work-grid .work-card{ --p:1 !important; }
+  .work-carousel.is-dragging .work-card{ transition:none; }
+  .work-carousel .work-card.is-front{ box-shadow:0 40px 80px rgba(0,0,0,.30); }
+  .work-carousel .work-card:not(.is-front) .work-card__link-icon{ opacity:0; }
+  .work-ctrl{
+    display:flex; align-items:center; justify-content:center; gap:14px;
+    margin-top:18px;
+  }
+  .work-ctrl button{
+    width:54px; height:54px; border-radius:50%;
+    border:1px solid rgba(0,0,0,.12); background:#fff; color:var(--ink, #111);
+    display:grid; place-items:center; cursor:pointer;
+    transition: background .3s var(--ease), color .3s var(--ease), border-color .3s var(--ease), transform .3s var(--ease);
+  }
+  .work-ctrl button:hover{ background:var(--orange); color:#fff; border-color:var(--orange); transform:scale(1.05); }
+  .work-dots{ display:flex; gap:8px; }
+  .work-dots button{
+    width:8px; height:8px; padding:0; border:0; border-radius:6px;
+    background:rgba(0,0,0,.18);
+    transition: width .35s var(--ease), background .35s var(--ease);
+  }
+  .work-dots button:hover{ transform:none; background:rgba(0,0,0,.35); }
+  .work-dots button.is-on{ width:26px; background:var(--orange); }
+  @media (max-width:640px){
+    .work-grid.work-carousel{ height:440px; }
+    .work-carousel .work-card{ width:min(64vw, 260px); }
   }
 </style>
 </head>
@@ -1868,48 +1885,88 @@ document.addEventListener('DOMContentLoaded', () => {
 })();
 </script>
 <script>
-/* ---------- projektet: 3D ne scroll + tilt me kursor ---------- */
+/* ---------- projektet: karusel 3D ---------- */
 (function(){
   var grid=document.querySelector('.work-grid'); if(!grid) return;
-  var cards=[].slice.call(grid.querySelectorAll('.work-card'));
+  var cards=[].slice.call(grid.querySelectorAll('.work-card')); var N=cards.length; if(N<3) return;
   var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
-  cards.forEach(function(c){ var g=document.createElement('span'); g.className='work-card__glare'; c.appendChild(g); });
 
-  if(!reduce){
-    var ticking=false;
-    function update(){
-      ticking=false;
-      var vh=innerHeight, gTop=grid.getBoundingClientRect().top;
-      cards.forEach(function(c){
-        var top=gTop+(c.offsetParent===grid ? c.offsetTop : c.offsetTop-grid.offsetTop);   // pozicioni pa transform
-        var p=Math.min(1,Math.max(0,(vh-top)/(vh*.55)));
-        c.style.setProperty('--p',(1-Math.pow(1-p,3)).toFixed(3));
-      });
-    }
-    addEventListener('scroll',function(){ if(!ticking){ ticking=true; requestAnimationFrame(update); } },{passive:true});
-    addEventListener('resize',update);
-    update();
-  }
+  grid.classList.add('work-carousel');
+  var ring=document.createElement('div'); ring.className='work-ring';
+  cards.forEach(function(c){ ring.appendChild(c); c.setAttribute('draggable','false'); });
+  grid.appendChild(ring);
 
-  if(!reduce && matchMedia('(hover:hover) and (pointer:fine)').matches){
-    cards.forEach(function(c){
-      c.addEventListener('pointermove',function(e){
-        var r=c.getBoundingClientRect();
-        var x=(e.clientX-r.left)/r.width, y=(e.clientY-r.top)/r.height;
-        c.classList.add('is-tilt');
-        c.style.setProperty('--ry',((x-.5)*14).toFixed(2)+'deg');
-        c.style.setProperty('--rx',((.5-y)*12).toFixed(2)+'deg');
-        c.style.setProperty('--gx',(x*100).toFixed(1)+'%');
-        c.style.setProperty('--gy',(y*100).toFixed(1)+'%');
-        c.style.setProperty('--bgx',(50+(.5-x)*40).toFixed(1)+'%');
-        c.style.setProperty('--bgy',((.5-y)*30+15).toFixed(1)+'%');
-      });
-      c.addEventListener('pointerleave',function(){
-        c.classList.remove('is-tilt');
-        ['--rx','--ry','--bgx','--bgy'].forEach(function(v){ c.style.removeProperty(v); });
-      });
+  var ctrl=document.createElement('div'); ctrl.className='work-ctrl';
+  var arrow=function(d){ return '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="'+d+'"/></svg>'; };
+  ctrl.innerHTML='<button type="button" class="work-prev" aria-label="Previous project">'+arrow('M15 18l-6-6 6-6')+'</button>'
+    +'<div class="work-dots">'+cards.map(function(c,i){ return '<button type="button" aria-label="Project '+(i+1)+'"></button>'; }).join('')+'</div>'
+    +'<button type="button" class="work-next" aria-label="Next project">'+arrow('M9 6l6 6-6 6')+'</button>';
+  grid.parentNode.insertBefore(ctrl, grid.nextSibling);
+  var dots=[].slice.call(ctrl.querySelectorAll('.work-dots button'));
+
+  var pos=0;
+  function wrap(d){ d=((d%N)+N)%N; return d>N/2 ? d-N : d; }
+  function layout(){
+    var w=cards[0].offsetWidth, radius=w*1.05;
+    cards.forEach(function(c,i){
+      var d=wrap(i-pos), ad=Math.abs(d), a=d*(360/N);
+      c.style.transform='rotateY('+a+'deg) translateZ('+radius+'px) rotateY('+(-a*.35)+'deg)';
+      c.style.opacity= ad>1.6 ? .3 : (1-ad*.22).toFixed(3);
+      c.style.filter='brightness('+(1-Math.min(ad,2)*.26).toFixed(3)+')';
+      c.style.zIndex=String(100-Math.round(ad*10));
+      c.classList.toggle('is-front', ad<.5);
+      c.tabIndex = ad<.5 ? 0 : -1;
     });
+    ring.style.transform='translateZ('+(-radius)+'px)';
+    var idx=((Math.round(pos)%N)+N)%N;
+    dots.forEach(function(d,i){ d.classList.toggle('is-on', i===idx); });
   }
+  function go(to){ pos=to; layout(); restart(); }
+  ctrl.querySelector('.work-prev').addEventListener('click',function(){ go(Math.round(pos)-1); });
+  ctrl.querySelector('.work-next').addEventListener('click',function(){ go(Math.round(pos)+1); });
+  dots.forEach(function(d,i){ d.addEventListener('click',function(){ go(Math.round(pos)+wrap(i-Math.round(pos))); }); });
+
+  // klikimi: karta anesore vjen perpara, karta perpara hap faqen
+  var dragged=false;
+  cards.forEach(function(c,i){
+    c.addEventListener('click',function(e){
+      if(dragged){ e.preventDefault(); return; }
+      if(!c.classList.contains('is-front')){ e.preventDefault(); go(Math.round(pos)+wrap(i-Math.round(pos))); }
+    });
+  });
+
+  // terheqja me mouse / gisht
+  var down=false, sx=0, sp=0;
+  grid.addEventListener('pointerdown',function(e){ down=true; dragged=false; sx=e.clientX; sp=pos; stop(); });
+  addEventListener('pointermove',function(e){
+    if(!down) return;
+    var dx=e.clientX-sx;
+    if(Math.abs(dx)>6){ dragged=true; grid.classList.add('is-dragging'); }
+    if(dragged){ pos=sp-dx/(cards[0].offsetWidth*.9); layout(); }
+  });
+  addEventListener('pointerup',function(){
+    if(!down) return; down=false; grid.classList.remove('is-dragging');
+    if(dragged){ pos=Math.round(pos); layout(); }
+    restart(); setTimeout(function(){ dragged=false; },60);
+  });
+
+  // shigjetat e tastieres kur karuseli eshte ne fokus
+  grid.addEventListener('keydown',function(e){
+    if(e.key==='ArrowLeft'){ e.preventDefault(); go(Math.round(pos)-1); }
+    if(e.key==='ArrowRight'){ e.preventDefault(); go(Math.round(pos)+1); }
+  });
+
+  // rrotullim automatik (ndalet kur kursori eshte siper ose kur seksioni nuk duket)
+  var timer=null, visible=false, hovering=false;
+  function stop(){ clearInterval(timer); timer=null; }
+  function restart(){ stop(); if(reduce||!visible||hovering) return; timer=setInterval(function(){ pos=Math.round(pos)+1; layout(); },4200); }
+  grid.addEventListener('mouseenter',function(){ hovering=true; stop(); });
+  grid.addEventListener('mouseleave',function(){ hovering=false; restart(); });
+  if('IntersectionObserver' in window){
+    new IntersectionObserver(function(en){ visible=en[0].isIntersecting; restart(); },{threshold:.35}).observe(grid);
+  }
+  addEventListener('resize',layout);
+  layout();
 })();
 </script>
 </body>
