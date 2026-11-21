@@ -1224,6 +1224,9 @@
   }
 
   /* ---------- projektet: karusel 3D ---------- */
+  /* kartat anesore nuk duhet ta zgjerojne faqen ne telefon */
+  #work{ overflow:hidden; }
+  @supports (overflow:clip){ #work{ overflow:clip; } }
   .work-grid.work-carousel{
     display:block;
     position:relative;
