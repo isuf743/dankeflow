@@ -1256,10 +1256,10 @@
 
   <div class="hero__figure">
     <div class="hero__figure-inner" id="figureParallax">
-      <div class="hf" id="headTurn" data-frames="37" data-path="assets/hero/seq/">
-        <img class="hf__poster" src="assets/hero/seq/00.webp" alt="Model wearing a low-poly geometric mask">
+      <div class="hf" id="headTurn" data-frames="37" data-path="assets/hero/seq/" data-v="3">
+        <img class="hf__poster" src="assets/hero/seq/00.webp?v=3" alt="Model wearing a low-poly geometric mask">
         <canvas width="1017" height="900" aria-hidden="true"></canvas>
-        <img class="hf__eyes" src="assets/hero/eyes.webp" alt="" aria-hidden="true">
+        <img class="hf__eyes" src="assets/hero/eyes.webp?v=3" alt="" aria-hidden="true">
         <span class="hf__hot" id="headTurnHot" aria-hidden="true"></span>
       </div>
     </div>
@@ -1759,7 +1759,7 @@ document.addEventListener('DOMContentLoaded', () => {
   var hot=document.getElementById('headTurnHot');
   if(!wrap||!hot) return;
   var canvas=wrap.querySelector('canvas'), ctx=canvas.getContext('2d');
-  var N=+wrap.dataset.frames, path=wrap.dataset.path;
+  var N=+wrap.dataset.frames, path=wrap.dataset.path, ver=wrap.dataset.v ? '?v='+wrap.dataset.v : '';
   var FPS_FWD=30, FPS_BACK=45;            // shpejtesia perpara / mbrapsht
   var frames=new Array(N), loaded=0;
   var cur=0, target=0, last=0, raf=null, acc=0;
@@ -1775,7 +1775,7 @@ document.addEventListener('DOMContentLoaded', () => {
         var im=new Image();
         im.decoding='async';
         im.onload=function(){ if(++loaded===N){ wrap.classList.add('is-ready'); draw(cur); } };
-        im.src=path+(i<10?'0':'')+i+'.webp';
+        im.src=path+(i<10?'0':'')+i+'.webp'+ver;
         frames[i]=im;
       })(i);
     }
