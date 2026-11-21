@@ -181,6 +181,12 @@
     transform:none;
     display:block;
   }
+  /* supet: zgjatim i palevizur ne te dy anet e videos */
+  .hero__figure .hf .hf__ext{
+    left:-25.926%;
+    width:151.85%;
+    height:100%;
+  }
   .hf canvas{ opacity:0; }
   .hf.is-ready canvas{ opacity:1; }
   .hf.is-ready .hf__poster{ opacity:0; }
@@ -1257,6 +1263,7 @@
   <div class="hero__figure">
     <div class="hero__figure-inner" id="figureParallax">
       <div class="hf" id="headTurn" data-frames="37" data-path="assets/hero/seq/">
+        <img class="hf__ext" src="assets/hero/shoulders.webp" alt="" aria-hidden="true">
         <img class="hf__poster" src="assets/hero/seq/00.webp" alt="Model wearing a low-poly geometric mask">
         <canvas width="600" height="900" aria-hidden="true"></canvas>
         <img class="hf__eyes" src="assets/hero/eyes.webp" alt="" aria-hidden="true">
