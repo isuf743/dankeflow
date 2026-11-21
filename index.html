@@ -168,9 +168,9 @@
   .hf{
     position:absolute;
     bottom:0;
-    left:5.6%;
-    width:85.8%;
-    aspect-ratio:600 / 900;
+    left:-18.233%;
+    width:145.383%;
+    aspect-ratio:1017 / 900;   /* kuadrat perfshijne edhe supet e plota */
   }
   .hero__figure .hf img,
   .hf canvas{
@@ -180,12 +180,6 @@
     width:100%; height:100%;
     transform:none;
     display:block;
-  }
-  /* supet: zgjatim i palevizur ne te dy anet e videos */
-  .hero__figure .hf .hf__ext{
-    left:-25.926%;
-    width:151.85%;
-    height:100%;
   }
   .hf canvas{ opacity:0; }
   .hf.is-ready canvas{ opacity:1; }
@@ -209,8 +203,8 @@
   }
   .hf__hot{
     position:absolute;
-    left:12%; top:2%;
-    width:72%; height:52%;
+    left:23.5%; top:2%;
+    width:42.5%; height:52%;
     border-radius:46%;
     pointer-events:auto;
     cursor:pointer;
@@ -1263,9 +1257,8 @@
   <div class="hero__figure">
     <div class="hero__figure-inner" id="figureParallax">
       <div class="hf" id="headTurn" data-frames="37" data-path="assets/hero/seq/">
-        <img class="hf__ext" src="assets/hero/shoulders.webp" alt="" aria-hidden="true">
         <img class="hf__poster" src="assets/hero/seq/00.webp" alt="Model wearing a low-poly geometric mask">
-        <canvas width="600" height="900" aria-hidden="true"></canvas>
+        <canvas width="1017" height="900" aria-hidden="true"></canvas>
         <img class="hf__eyes" src="assets/hero/eyes.webp" alt="" aria-hidden="true">
         <span class="hf__hot" id="headTurnHot" aria-hidden="true"></span>
       </div>
