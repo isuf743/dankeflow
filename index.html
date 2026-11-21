@@ -1205,6 +1205,23 @@
     footer{ flex-direction:column; gap:14px; text-align:center; }
     .footer__brand{ flex-direction:column; gap:12px; }
   }
+
+  /* ---------- telefon/tablet: figura mbaron bashke me sfondin portokalli ---------- */
+  @media (max-width:960px){
+    .hero{
+      display:grid;
+      grid-template-columns:100%;
+    }
+    .hero__orange{ grid-area:1 / 1; }
+    .hero__white{ grid-area:2 / 1; }
+    .hero__figure{
+      grid-area:1 / 1;
+      position:relative;
+      top:auto; bottom:auto;
+      align-self:end;
+      justify-self:end;
+    }
+  }
 </style>
 </head>
 <body>
