@@ -1275,8 +1275,14 @@
   .work-dots button:hover{ transform:none; background:rgba(0,0,0,.35); }
   .work-dots button.is-on{ width:26px; background:var(--orange); }
   @media (max-width:640px){
-    .work-grid.work-carousel{ height:440px; }
+    /* lartesia = karta + pak hapesire per hijen; pa bosh poshte */
+    .work-grid.work-carousel{ height:calc(min(64vw, 260px) * 1.25 + 28px); margin-top:44px; }
     .work-carousel .work-card{ width:min(64vw, 260px); }
+    .work-ctrl{ margin-top:8px; }
+    .work-carousel .work-card{ box-shadow:0 12px 26px rgba(0,0,0,.18); }
+    .work-carousel .work-card.is-front{ box-shadow:0 16px 32px rgba(0,0,0,.24); }
+    #work{ padding-bottom:28px; }
+    #about{ padding-top:48px; }
   }
 </style>
 </head>
